@@ -119,7 +119,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        async public virtual Task<HttpResponseMessage> Get( Uri url ) => await AutoFollowRedirect( await DoGet( url ) );
+        public virtual async Task<HttpResponseMessage> Get( Uri url ) => await HandleResponse( await DoGet( url ) );
 
         /// <summary>
         /// Issues a GET request to the relative url on <see cref="BaseAddress"/> or to an absolute url.
@@ -207,7 +207,7 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="content">The content.</param>
         /// <returns>The response.</returns>
-        public async virtual Task<HttpResponseMessage> Post( Uri url, HttpContent content ) => await AutoFollowRedirect( await DoPost( url, content ) );
+        public async virtual Task<HttpResponseMessage> Post( Uri url, HttpContent content ) => await HandleResponse( await DoPost( url, content ) );
 
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url 

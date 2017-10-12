@@ -20,10 +20,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.AspNet.Tester.Tests", "Tests\CK.AspNet.Tester.Tests\CK.AspNet.Tester.Tests.csproj", "{91C81A60-4C00-42A9-A521-27F950078F0C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5C8E1B59-5506-46D9-B18C-0942644EA584} = {5C8E1B59-5506-46D9-B18C-0942644EA584}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.AspNet.Tester.NetCore.Tests", "Tests\CK.AspNet.Tester.NetCore.Tests\CK.AspNet.Tester.NetCore.Tests.csproj", "{C6479076-F93A-450A-8B57-410578474BAF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "Tests\WebApp\WebApp.csproj", "{5C8E1B59-5506-46D9-B18C-0942644EA584}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StupidMiddleware", "Tests\StupidMiddleware\StupidMiddleware.csproj", "{60AD6367-3D2A-4557-881D-5BB850FFD178}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +56,10 @@ Global
 		{5C8E1B59-5506-46D9-B18C-0942644EA584}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C8E1B59-5506-46D9-B18C-0942644EA584}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C8E1B59-5506-46D9-B18C-0942644EA584}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60AD6367-3D2A-4557-881D-5BB850FFD178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60AD6367-3D2A-4557-881D-5BB850FFD178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60AD6367-3D2A-4557-881D-5BB850FFD178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60AD6367-3D2A-4557-881D-5BB850FFD178}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +68,7 @@ Global
 		{91C81A60-4C00-42A9-A521-27F950078F0C} = {1A7E3E39-6483-4802-8B27-C4D245D35D09}
 		{C6479076-F93A-450A-8B57-410578474BAF} = {1A7E3E39-6483-4802-8B27-C4D245D35D09}
 		{5C8E1B59-5506-46D9-B18C-0942644EA584} = {1A7E3E39-6483-4802-8B27-C4D245D35D09}
+		{60AD6367-3D2A-4557-881D-5BB850FFD178} = {1A7E3E39-6483-4802-8B27-C4D245D35D09}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39625DF9-0D4A-49B5-83F8-14557B157E88}

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CK.AspNet.Tester\CK.AspNet.Tester.csproj" />
+    <ProjectReference Include="..\StupidMiddleware\StupidMiddleware.csproj" />
     <PackageReference Include="FluentAssertions" Version="4.19.4" />
   </ItemGroup>
 

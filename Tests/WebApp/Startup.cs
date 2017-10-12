@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using CK.AspNet;
 using Microsoft.Extensions.Logging;
+using CK.AspNet.Tester.Tests;
 
 namespace WebApp
 {
@@ -15,6 +16,7 @@ namespace WebApp
     {
         public void ConfigureServices( IServiceCollection services )
         {
+            services.AddSingleton<StupidService>();
         }
 
         public void Configure( IApplicationBuilder app, IHostingEnvironment env )
@@ -24,33 +26,7 @@ namespace WebApp
                 app.UseDeveloperExceptionPage();
             }
             app.UseRequestMonitor();
-
-            app.Run( async ( context ) =>
-             {
-                 if( context.Request.Path.StartsWithSegments( "/bug" ) )
-                 {
-                     throw new Exception( "A bug occurred." );
-                 }
-                 if( context.Request.Path.StartsWithSegments( "/aspnetlogs" ) )
-                 {
-                     var f = context.RequestServices.GetService<ILoggerFactory>();
-                     var logger = f.CreateLogger( "Test" );
-                     logger.LogCritical( $"This is a Critical log." );
-                     logger.LogError( $"This is a Error log." );
-                     logger.LogWarning( $"This is a Warning log." );
-                     logger.LogInformation( $"This is a Information log." );
-                     logger.LogDebug( $"This is a Debug log." );
-                     logger.LogTrace( $"This is a Trace log." );
-                     return;
-                 }
-                 if( context.Request.Path.StartsWithSegments( "/quit" ) )
-                 {
-                     var appLifetime = context.RequestServices.GetService<IApplicationLifetime>();
-                     appLifetime.StopApplication();
-                     return;
-                 }
-                 await context.Response.WriteAsync( "Hello World!" );
-             } );
+            app.UseMiddleware<StupidMiddleware>();
         }
     }
 }
