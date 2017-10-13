@@ -52,43 +52,6 @@ namespace CK.AspNet.Tester
         public CookieContainer Cookies { get; }
 
         /// <summary>
-        /// Clears cookies from a base path and optional sub paths.
-        /// </summary>
-        /// <param name="basePath">The base url. Should not be null.</param>
-        /// <param name="subPath">Sub paths for which cookies must be cleared.</param>
-        public void ClearCookies( Uri basePath, IEnumerable<string> subPath )
-        {
-            foreach( Cookie c in Cookies.GetCookies( basePath ) )
-            {
-                c.Expired = true;
-            }
-            if( subPath != null )
-            {
-                foreach( string u in subPath )
-                {
-                    if( string.IsNullOrWhiteSpace( u ) ) continue;
-                    Uri normalized = new Uri( basePath, u[u.Length - 1] != '/' ? u + '/' : u );
-                    foreach( Cookie c in Cookies.GetCookies( normalized ) )
-                    {
-                        c.Expired = true;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Clears cookies from a base path and optional sub paths.
-        /// </summary>
-        /// <param name="basePath">The base url. Should not be null.</param>
-        /// <param name="subPath">Optional sub paths for which cookies must be cleared.</param>
-        public void ClearCookies( Uri basePath, params string[] subPath ) => ClearCookies( basePath, (IEnumerable<string>)subPath );
-
-        /// <summary>
-        /// Clears cookies from <see cref="BaseAddress"/> and optional sub paths.
-        /// </summary>
-        public void ClearCookies( params string[] subPath ) => ClearCookies( BaseAddress, subPath );
-
-        /// <summary>
         /// Gets or sets the maximum number of redirections that will be automatically followed.
         /// Defaults to 50.
         /// Set it to 0 to manually follow redirections thanks to <see cref="FollowRedirect(HttpResponseMessage, bool)"/>.
@@ -254,29 +217,28 @@ namespace CK.AspNet.Tester
                     : m;
         }
 
-
         /// <summary>
-        /// Default <see cref="TestClientBase.OnReceiveMessage"/> implementation.
-        /// Calls <see cref="TestClientBase.UpdateCookiesWithPathHandling"/> and
+        /// Default <see cref="OnReceiveMessage"/> implementation.
+        /// Calls <see cref="CookieContainerExtensions.UpdateCookiesWithPathHandling"/> and
         /// returns true to follow redirects.
         /// </summary>
         /// <param name="m">The received message.</param>
         /// <returns>True to auto follow redirects if any.</returns>
         public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
         {
-            UpdateCookiesWithPathHandling( Cookies, m );
+            Cookies.UpdateCookiesWithPathHandling( m );
             return Task.FromResult( true );
         }
 
         /// <summary>
         /// Follows a redirected url once if the response's status is <see cref="HttpStatusCode.Moved"/> (301), 
         /// <see cref="HttpStatusCode.Found"/> (302) or <see cref="HttpStatusCode.SeeOther"/> (303).
-        /// The <see cref="HttpStatusCode.RedirectMethod"/> (303) will raise a <see cref="NotSupportedException"/>
+        /// The <see cref="HttpStatusCode.TemporaryRedirect"/> (307) will raise a <see cref="NotSupportedException"/>
         /// at this time.
         /// </summary>
         /// <param name="response">The initial response.</param>
         /// <param name="throwIfNotRedirect">
-        /// When the <paramref name="response"/> is not a 301 or 302 and this is true, this method 
+        /// When the <paramref name="response"/> is not a 301, 302 or 303 and this is true, this method 
         /// throws an exception. When this parameter is false, the <paramref name="response"/>
         /// is returned (since it is the final redirected response).</param>
         /// <returns>The redirected response.</returns>
@@ -307,72 +269,9 @@ namespace CK.AspNet.Tester
             return DoGet( redirectUrl );
         }
 
-
         /// <summary>
         /// Must dispose any resources specific to this client.
         /// </summary>
         public abstract void Dispose();
-
-        static readonly Regex _rCookiePath = new Regex(
-                  "(?<=^|;)\\s*path\\s*=\\s*(?<p>[^;\\s]*)\\s*;?",
-                    RegexOptions.IgnoreCase
-                    | RegexOptions.ExplicitCapture
-                    | RegexOptions.CultureInvariant
-                    | RegexOptions.Compiled
-                    );
-
-        /// <summary>
-        /// Corrects CookieContainer behavior.
-        /// See: https://github.com/dotnet/corefx/issues/21250#issuecomment-309613552
-        /// This fix the Cookie path bug of the CookieContainer but does not handle any other
-        /// specification from current (since 2011) https://tools.ietf.org/html/rfc6265.
-        /// </summary>
-        /// <param name="container">The cookie container to update.</param>
-        /// <param name="response">The response message obtained from <see cref="DoGet"/> or <see cref="DoPost"/>.</param>
-        static public void UpdateCookiesWithPathHandling( CookieContainer container, HttpResponseMessage response )
-        {
-            var absoluteUrl = GetCheckedRequestAbsoluteUri( container, response );
-            if( response.Headers.Contains( HeaderNames.SetCookie ) )
-            {
-                var root = new Uri( absoluteUrl.GetLeftPart( UriPartial.Authority ) );
-                var cookies = response.Headers.GetValues( HeaderNames.SetCookie );
-                foreach( var cookie in cookies )
-                {
-                    string cFinal = cookie;
-                    Uri rFinal = null;
-                    Match m = _rCookiePath.Match( cookie );
-                    while( m.Success )
-                    {
-                        // Last Path wins: see https://tools.ietf.org/html/rfc6265#section-5.3 §7.
-                        cFinal = cFinal.Remove( m.Index, m.Length );
-                        rFinal = new Uri( root, m.Groups[1].Value );
-                        m = m.NextMatch();
-                    }
-                    if( rFinal == null )
-                    {
-                        // No path specified in cookie: the path is the one of the request.
-                        rFinal = new Uri( absoluteUrl.GetLeftPart( UriPartial.Path ) );
-                    }
-                    container.SetCookies( rFinal, cFinal );
-                }
-            }
-        }
-
-        /// <summary>
-        /// Helper that checks its parameters and returns the request uri.
-        /// </summary>
-        /// <param name="container">A cookie container that must not be null./</param>
-        /// <param name="response">The received response.</param>
-        /// <returns>The requested uri.</returns>
-        public static Uri GetCheckedRequestAbsoluteUri( CookieContainer container, HttpResponseMessage response )
-        {
-            if( container == null ) throw new ArgumentNullException( nameof( container ) );
-            if( response == null ) throw new ArgumentNullException( nameof( response ) );
-            var uri = response.RequestMessage.RequestUri;
-            if( uri == null ) throw new ArgumentNullException( "response.RequestMessage.RequestUri" );
-            if( !uri.IsAbsoluteUri ) throw new ArgumentException( "Uri must be absolute.", "response.RequestMessage.RequestUri" );
-            return uri;
-        }
-
     }
 }
