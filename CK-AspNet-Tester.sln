@@ -20,9 +20,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCakeBuilder", "CodeCakeBuilder\CodeCakeBuilder.csproj", "{FD4817B6-3CD7-4E74-AA10-7CA95FDFCF2D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.AspNet.Tester.Tests", "Tests\CK.AspNet.Tester.Tests\CK.AspNet.Tester.Tests.csproj", "{91C81A60-4C00-42A9-A521-27F950078F0C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{5C8E1B59-5506-46D9-B18C-0942644EA584} = {5C8E1B59-5506-46D9-B18C-0942644EA584}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CK.AspNet.Tester.NetCore.Tests", "Tests\CK.AspNet.Tester.NetCore.Tests\CK.AspNet.Tester.NetCore.Tests.csproj", "{C6479076-F93A-450A-8B57-410578474BAF}"
 EndProject
