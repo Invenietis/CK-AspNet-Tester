@@ -62,6 +62,7 @@ namespace CK.AspNet.Tester
             AddCookies( requestBuilder, absoluteUrl );
             AddToken( requestBuilder );
             var response = await requestBuilder.GetAsync();
+            Cookies.UpdateCookiesWithPathHandling( response );
             return response;
         }
 
@@ -85,6 +86,7 @@ namespace CK.AspNet.Tester
              {
                  message.Content = content;
              } ).PostAsync();
+            Cookies.UpdateCookiesWithPathHandling( response );
             return response;
         }
 
@@ -111,7 +113,7 @@ namespace CK.AspNet.Tester
                 _client = client;
             }
 
-            protected override Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken )
+            protected override async Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken )
             {
                 Debug.Assert( !_client.BaseAddress.IsBaseOf( request.RequestUri ) );
                 var cookies = _client.Cookies.GetCookieHeader( request.RequestUri );
@@ -119,10 +121,11 @@ namespace CK.AspNet.Tester
                 {
                     request.Headers.Add( HeaderNames.Cookie, cookies );
                 }
-                return base.SendAsync( request, cancellationToken );
+                var r = await base.SendAsync( request, cancellationToken );
+                _client.Cookies.UpdateCookiesWithPathHandling( r );
+                return r;
             }
         }
-
 
         HttpClient GetExternalClient()
         {

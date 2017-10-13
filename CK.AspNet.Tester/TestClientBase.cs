@@ -224,14 +224,12 @@ namespace CK.AspNet.Tester
 
         /// <summary>
         /// Default <see cref="OnReceiveMessage"/> implementation.
-        /// Calls <see cref="CookieContainerExtensions.UpdateCookiesWithPathHandling"/> and
-        /// returns true to follow redirects.
+        /// Returns true to follow redirects.
         /// </summary>
         /// <param name="m">The received message.</param>
         /// <returns>True to auto follow redirects if any.</returns>
         public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
         {
-            Cookies.UpdateCookiesWithPathHandling( m );
             return Task.FromResult( true );
         }
 
