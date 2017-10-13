@@ -11,8 +11,16 @@ using CK.Core;
 
 namespace WebApp
 {
+    /// <summary>
+    /// Entry point.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Main with Debug level logging and Monitoring.
+        /// Appsettings.json configures the console.
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main( string[] args )
         {
             // Allow full debug logs for this sample application.

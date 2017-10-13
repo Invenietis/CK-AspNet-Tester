@@ -14,6 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CK.AspNet.Tester.Tests
 {
+    /// <summary>
+    /// Test middleware with a rather stupid API.
+    /// </summary>
     public class StupidMiddleware
     {
         readonly RequestDelegate _next;
@@ -22,6 +25,13 @@ namespace CK.AspNet.Tester.Tests
         readonly ILogger _logger;
         static int _cookieNumber;
 
+        /// <summary>
+        /// Initializes a new StupidMiddleware.
+        /// </summary>
+        /// <param name="next">Next handler.</param>
+        /// <param name="s">The stupid service.</param>
+        /// <param name="lifetime">The application lifetime to handle /quit.</param>
+        /// <param name="logger">Logger factory to handle /aspnetlogs.</param>
         public StupidMiddleware( RequestDelegate next,
             StupidService s,
             IApplicationLifetime lifetime,
@@ -33,6 +43,11 @@ namespace CK.AspNet.Tester.Tests
             _logger = logger.CreateLogger<StupidMiddleware>();
         }
 
+        /// <summary>
+        /// Implementation.
+        /// </summary>
+        /// <param name="context">The http context.</param>
+        /// <returns>The awaitable.</returns>
         public Task Invoke( HttpContext context )
         {
             if( context.Request.Path.StartsWithSegments( "/sayHello" ) )

@@ -239,8 +239,7 @@ namespace CK.AspNet.Tester
         /// Gets or sets a <see cref="HttpResponseMessage"/> handler.
         /// This handler will be called immediatly after the <see cref="DoPost"/> or <see cref="DoGet"/>
         /// methods and is typically in charge of handling cookies (thanks
-        /// to <see cref="UpdateCookiesSimple"/> or <see cref="UpdateCookiesWithPathHandling"/> helpers
-        /// for instance), but not the redirections.
+        /// to <see cref="UpdateCookiesWithPathHandling"/> helper for instance), but not the redirections.
         /// This handler must return true to automatically call <see cref="AutoFollowRedirect"/>
         /// or false if for any reason, AutoFollowRedirect must not be done.
         /// This property MUST not be null.
