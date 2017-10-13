@@ -20,7 +20,7 @@ namespace CK.AspNet.Tester.Tests
         readonly StupidService _s;
         readonly IApplicationLifetime _lifetime;
         readonly ILogger _logger;
-        int _cookieNumber;
+        static int _cookieNumber;
 
         public StupidMiddleware( RequestDelegate next,
             StupidService s,
@@ -51,7 +51,7 @@ namespace CK.AspNet.Tester.Tests
                 string name = context.Request.Query["name"];
                 string path = context.Request.Query["path"];
                 int num = Interlocked.Increment( ref _cookieNumber );
-                context.Response.Cookies.Append( name, $"Cookie n°{num}", new CookieOptions()
+                context.Response.Cookies.Append( name, $"Cookie{num}", new CookieOptions()
                 {
                     Path = path
                 } );

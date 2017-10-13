@@ -73,20 +73,30 @@ namespace CK.AspNet.Tester.Tests
 
         static public async Task setting_cookie_and_delete_without_path( TestClientBase client )
         {
+            var setCookieUri = new Uri( client.BaseAddress, "/setCookie" );
             using( HttpResponseMessage m = await client.Get( "/setCookie?name=Gateau" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().StartWith( "Cookie set: Gateau Path:  Value: " );
-                var cookies = client.Cookies.GetCookies( client.BaseAddress );
+                var rootCookies = client.Cookies.GetCookies( client.BaseAddress );
+                rootCookies.Should().HaveCount( 0 );
+                var cookies = client.Cookies.GetCookies( setCookieUri );
                 cookies.Should().HaveCount( 1 );
                 cookies[0].Name.Should().Be( "Gateau" );
-                cookies[0].Path.Should().Be( "/" );
+                cookies[0].Path.Should().Be( "/setCookie" );
             }
             using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie delete: Gateau Path: " );
-                var cookies = client.Cookies.GetCookies( client.BaseAddress );
+                var cookies = client.Cookies.GetCookies( setCookieUri );
+                cookies.Should().HaveCount( 1 );
+            }
+            using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau&path=/setCookie" ) )
+            {
+                var text = await m.Content.ReadAsStringAsync();
+                text.Should().Be( "Cookie delete: Gateau Path: /setCookie" );
+                var cookies = client.Cookies.GetCookies( setCookieUri );
                 cookies.Should().BeEmpty();
             }
         }

@@ -30,6 +30,7 @@ namespace CK.AspNet.Tester
             BaseAddress = baseAddress;
             Cookies = cookies;
             MaxAutomaticRedirections = 50;
+            OnReceiveMessage = DefaultOnReceiveMessage;
         }
 
         /// <summary>
@@ -123,9 +124,8 @@ namespace CK.AspNet.Tester
 
         /// <summary>
         /// Issues a GET request to the relative url on <see cref="BaseAddress"/> or to an absolute url.
-        /// Implementations must handle <see cref="Token"/>, <see cref="Cookies"/> (thanks
-        /// to <see cref="UpdateCookiesSimple"/> or <see cref="UpdateCookiesWithPathHandling"/> helpers
-        /// for instance), but not the redirections.
+        /// Implementations must set the <see cref="Token"/> and the <see cref="Cookies"/> before sending
+        /// the request.
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
@@ -212,9 +212,6 @@ namespace CK.AspNet.Tester
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url 
         /// with an <see cref="HttpContent"/>.
-        /// Implementations must handle <see cref="Token"/>, <see cref="Cookies"/> (thanks
-        /// to <see cref="UpdateCookiesSimple"/> or <see cref="UpdateCookiesWithPathHandling"/> helpers
-        /// for instance), but not the redirections.
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="content">The content.</param>
@@ -241,7 +238,9 @@ namespace CK.AspNet.Tester
         /// <summary>
         /// Gets or sets a <see cref="HttpResponseMessage"/> handler.
         /// This handler will be called immediatly after the <see cref="DoPost"/> or <see cref="DoGet"/>
-        /// methods and is typically in charge of handling cookies.
+        /// methods and is typically in charge of handling cookies (thanks
+        /// to <see cref="UpdateCookiesSimple"/> or <see cref="UpdateCookiesWithPathHandling"/> helpers
+        /// for instance), but not the redirections.
         /// This handler must return true to automatically call <see cref="AutoFollowRedirect"/>
         /// or false if for any reason, AutoFollowRedirect must not be done.
         /// This property MUST not be null.
@@ -254,6 +253,20 @@ namespace CK.AspNet.Tester
             return await OnReceiveMessage( m )
                     ? await AutoFollowRedirect( m )
                     : m;
+        }
+
+
+        /// <summary>
+        /// Default <see cref="TestClientBase.OnReceiveMessage"/> implementation.
+        /// Calls <see cref="TestClientBase.UpdateCookiesWithPathHandling"/> and
+        /// returns true to follow redirects.
+        /// </summary>
+        /// <param name="m">The received message.</param>
+        /// <returns>True to auto follow redirects if any.</returns>
+        public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
+        {
+            UpdateCookiesWithPathHandling( Cookies, m );
+            return Task.FromResult( true );
         }
 
         /// <summary>
@@ -301,7 +314,13 @@ namespace CK.AspNet.Tester
         /// </summary>
         public abstract void Dispose();
 
-        static readonly Regex _rCookiePath = new Regex( "(?<=^|;)\\s*path\\s*=\\s*(?<p>.*?);?", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture );
+        static readonly Regex _rCookiePath = new Regex(
+                  "(?<=^|;)\\s*path\\s*=\\s*(?<p>[^;\\s]*)\\s*;?",
+                    RegexOptions.IgnoreCase
+                    | RegexOptions.ExplicitCapture
+                    | RegexOptions.CultureInvariant
+                    | RegexOptions.Compiled
+                    );
 
         /// <summary>
         /// Corrects CookieContainer behavior.
@@ -320,44 +339,22 @@ namespace CK.AspNet.Tester
                 var cookies = response.Headers.GetValues( HeaderNames.SetCookie );
                 foreach( var cookie in cookies )
                 {
-                    string cFinal;
-                    Uri rFinal;
+                    string cFinal = cookie;
+                    Uri rFinal = null;
                     Match m = _rCookiePath.Match( cookie );
-                    if( m.Success )
+                    while( m.Success )
                     {
                         // Last Path wins: see https://tools.ietf.org/html/rfc6265#section-5.3 §7.
-                        do
-                        {
-                            cFinal = cookie.Remove( m.Index, m.Length );
-                            rFinal = new Uri( root, m.Groups[1].Value );
-                            m = m.NextMatch();
-                        }
-                        while( m.Success );
+                        cFinal = cFinal.Remove( m.Index, m.Length );
+                        rFinal = new Uri( root, m.Groups[1].Value );
+                        m = m.NextMatch();
                     }
-                    else
+                    if( rFinal == null )
                     {
-                        cFinal = cookie;
-                        rFinal = root;
+                        // No path specified in cookie: the path is the one of the request.
+                        rFinal = new Uri( absoluteUrl.GetLeftPart( UriPartial.Path ) );
                     }
                     container.SetCookies( rFinal, cFinal );
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update cookie container by simply handling Set-Cookie response headers.
-        /// </summary>
-        /// <param name="container">The cookie container to update.</param>
-        /// <param name="response">The response message obtained from <see cref="DoGet"/> or <see cref="DoPost"/>.</param>
-        static public void UpdateCookiesSimple( CookieContainer container, HttpResponseMessage response )
-        {
-            var absoluteUrl = GetCheckedRequestAbsoluteUri( container, response );
-            if( response.Headers.Contains( HeaderNames.SetCookie ) )
-            {
-                var cookies = response.Headers.GetValues( HeaderNames.SetCookie );
-                foreach( var cookie in cookies )
-                {
-                    container.SetCookies( absoluteUrl, cookie );
                 }
             }
         }

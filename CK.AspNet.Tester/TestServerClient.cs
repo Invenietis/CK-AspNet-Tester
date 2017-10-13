@@ -30,7 +30,6 @@ namespace CK.AspNet.Tester
         {
             _testServer = testServer;
             _disposeTestServer = disposeTestServer;
-            OnReceiveMessage = DefaultOnReceiveMessage;
         }
 
         /// <summary>
@@ -83,27 +82,6 @@ namespace CK.AspNet.Tester
                  message.Content = content;
              } ).PostAsync();
             return response;
-        }
-
-        /// <summary>
-        /// Default <see cref="TestClientBase.OnReceiveMessage"/> implementation.
-        /// Calls <see cref="TestClientBase.UpdateCookiesSimple"/> and
-        /// returns true to follow redirects.
-        /// <para>
-        /// TODO: handle external client either with a TestClient... or if we keep a simple
-        ///       HttpClient, we may use UpdateCookiesWithPathHandling if the requested uri
-        ///       is not based on this BaseAddress.
-        ///       Real Tests and more investigations are needed here (with a separate server)
-        ///       since I do NOT understand why UpdateCookiesWithPathHandling (seems to) fail with
-        ///        the test server :(.
-        /// </para>
-        /// </summary>
-        /// <param name="m">The received message.</param>
-        /// <returns>True to auto follow redirects if any.</returns>
-        public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
-        {
-            UpdateCookiesSimple( Cookies, m );
-            return Task.FromResult( true );
         }
 
         /// <summary>
