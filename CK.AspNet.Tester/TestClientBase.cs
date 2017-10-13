@@ -52,6 +52,11 @@ namespace CK.AspNet.Tester
         public CookieContainer Cookies { get; }
 
         /// <summary>
+        /// Clears cookies from <see cref="BaseAddress"/> and optional sub paths.
+        /// </summary>
+        public void ClearCookies( params string[] subPath ) => Cookies.ClearCookies( BaseAddress, subPath );
+
+        /// <summary>
         /// Gets or sets the maximum number of redirections that will be automatically followed.
         /// Defaults to 50.
         /// Set it to 0 to manually follow redirections thanks to <see cref="FollowRedirect(HttpResponseMessage, bool)"/>.
