@@ -108,7 +108,7 @@ namespace CK.AspNet.Tester
             readonly TestServerClient _client;
 
             public ExternalHandler( TestServerClient client )
-                : base( new HttpClientHandler() { AllowAutoRedirect = false } )
+                : base( new HttpClientHandler() { AllowAutoRedirect = false, UseCookies = false } )
             {
                 _client = client;
             }

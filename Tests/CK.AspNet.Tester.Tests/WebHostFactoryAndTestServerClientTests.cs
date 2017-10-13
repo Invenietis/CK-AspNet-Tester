@@ -68,6 +68,16 @@ namespace CK.AspNet.Tester.Tests
                 await CommonTests.setting_cookie_and_delete_without_path( client );
             }
         }
+
+        [Test]
+        public async Task setting_cookie_and_delete_on_sub_path()
+        {
+            using( var client = CreateClient() )
+            {
+                await CommonTests.setting_cookie_and_delete_on_sub_path( client );
+            }
+        }
+
         static TestClientBase CreateClient()
         {
             var b = WebHostBuilderFactory.Create( null, null,

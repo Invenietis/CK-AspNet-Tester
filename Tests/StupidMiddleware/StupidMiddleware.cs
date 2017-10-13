@@ -23,7 +23,6 @@ namespace CK.AspNet.Tester.Tests
         readonly StupidService _s;
         readonly IApplicationLifetime _lifetime;
         readonly ILogger _logger;
-        static int _cookieNumber;
 
         /// <summary>
         /// Initializes a new StupidMiddleware.
@@ -50,6 +49,18 @@ namespace CK.AspNet.Tester.Tests
         /// <returns>The awaitable.</returns>
         public Task Invoke( HttpContext context )
         {
+            if( context.Request.Query.ContainsKey( "readCookies" ) )
+            {
+                context.Response.StatusCode = StatusCodes.Status200OK;
+                var b = new StringBuilder();
+                foreach( var c in context.Request.Cookies )
+                {
+                    b.Append( c.Key ).Append( ':' ).AppendLine( c.Value );
+                }
+                Console.WriteLine( ">> readCookies" );
+                Console.WriteLine( b.ToString() );
+                return context.Response.WriteAsync( b.ToString() );
+            }
             if( context.Request.Path.StartsWithSegments( "/sayHello" ) )
             {
                 context.Response.StatusCode = StatusCodes.Status200OK;
@@ -65,12 +76,13 @@ namespace CK.AspNet.Tester.Tests
             {
                 string name = context.Request.Query["name"];
                 string path = context.Request.Query["path"];
-                int num = Interlocked.Increment( ref _cookieNumber );
-                context.Response.Cookies.Append( name, $"Cookie{num}", new CookieOptions()
+                string value = context.Request.Query["value"];
+                if( String.IsNullOrWhiteSpace( value ) ) value = "CookieValue";
+                context.Response.Cookies.Append( name, value, new CookieOptions()
                 {
                     Path = path
                 } );
-                return context.Response.WriteAsync( $"Cookie set: {name} Path: {path} Value: '{num}'" );
+                return context.Response.WriteAsync( $"Cookie set: {name} Path: {path} Value: {value}" );
             }
             if( context.Request.Path.StartsWithSegments( "/deleteCookie" ) )
             {

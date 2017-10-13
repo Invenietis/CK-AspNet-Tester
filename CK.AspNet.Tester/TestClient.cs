@@ -26,7 +26,7 @@ namespace CK.AspNet.Tester
             readonly TestClient _client;
 
             public Handler( TestClient client )
-                : base( new HttpClientHandler() { AllowAutoRedirect = false } )
+                : base( new HttpClientHandler() { AllowAutoRedirect = false, UseCookies = false } )
             {
                 _client = client;
             }

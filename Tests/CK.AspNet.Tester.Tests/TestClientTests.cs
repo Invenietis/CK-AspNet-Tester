@@ -78,6 +78,12 @@ namespace CK.AspNet.Tester.Tests
         }
 
         [Test]
+        public async Task setting_cookie_and_delete_on_sub_path()
+        {
+            await CommonTests.setting_cookie_and_delete_on_sub_path( _client );
+        }
+
+        [Test]
         public async Task setting_cookie_and_delete_without_path()
         {
             await CommonTests.setting_cookie_and_delete_without_path( _client );
