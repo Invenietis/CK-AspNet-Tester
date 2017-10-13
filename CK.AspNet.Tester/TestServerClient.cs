@@ -6,13 +6,17 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Diagnostics;
 
 namespace CK.AspNet.Tester
 {
     /// <summary>
-    /// Client helper that wraps a <see cref="TestServer"/> and provides simple methods (synchronous)
+    /// Client helper that wraps a <see cref="TestServer"/> and provides simple methods (asynchronous)
     /// to easily Get/Post requests, manage cookies and a token, follow redirects
     /// (or not) and Reads the response contents.
+    /// This TestServerClient routes the external requests to an internal HttpClient
+    /// that shares its own CookieContainer.
     /// </summary>
     public class TestServerClient : TestClientBase
     {
@@ -30,7 +34,6 @@ namespace CK.AspNet.Tester
         {
             _testServer = testServer;
             _disposeTestServer = disposeTestServer;
-            OnReceiveMessage = DefaultOnReceiveMessage;
         }
 
         /// <summary>
@@ -59,6 +62,7 @@ namespace CK.AspNet.Tester
             AddCookies( requestBuilder, absoluteUrl );
             AddToken( requestBuilder );
             var response = await requestBuilder.GetAsync();
+            Cookies.UpdateCookiesWithPathHandling( response );
             return response;
         }
 
@@ -82,28 +86,8 @@ namespace CK.AspNet.Tester
              {
                  message.Content = content;
              } ).PostAsync();
+            Cookies.UpdateCookiesWithPathHandling( response );
             return response;
-        }
-
-        /// <summary>
-        /// Default <see cref="TestClientBase.OnReceiveMessage"/> implementation.
-        /// Calls <see cref="TestClientBase.UpdateCookiesSimple"/> and
-        /// returns true to follow redirects.
-        /// <para>
-        /// TODO: handle external client either with a TestClient... or if we keep a simple
-        ///       HttpClient, we may use UpdateCookiesWithPathHandling if the requested uri
-        ///       is not based on this BaseAddress.
-        ///       Real Tests and more investigations are needed here (with a separate server)
-        ///       since I do NOT understand why UpdateCookiesWithPathHandling (seems to) fail with
-        ///        the test server :(.
-        /// </para>
-        /// </summary>
-        /// <param name="m">The received message.</param>
-        /// <returns>True to auto follow redirects if any.</returns>
-        public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
-        {
-            UpdateCookiesSimple( Cookies, m );
-            return Task.FromResult( true );
         }
 
         /// <summary>
@@ -119,15 +103,35 @@ namespace CK.AspNet.Tester
             if( _disposeTestServer ) _testServer.Dispose();
         }
 
+        class ExternalHandler : DelegatingHandler
+        {
+            readonly TestServerClient _client;
+
+            public ExternalHandler( TestServerClient client )
+                : base( new HttpClientHandler() { AllowAutoRedirect = false, UseCookies = false } )
+            {
+                _client = client;
+            }
+
+            protected override async Task<HttpResponseMessage> SendAsync( HttpRequestMessage request, CancellationToken cancellationToken )
+            {
+                Debug.Assert( !_client.BaseAddress.IsBaseOf( request.RequestUri ) );
+                var cookies = _client.Cookies.GetCookieHeader( request.RequestUri );
+                if( !String.IsNullOrWhiteSpace( cookies ) )
+                {
+                    request.Headers.Add( HeaderNames.Cookie, cookies );
+                }
+                var r = await base.SendAsync( request, cancellationToken );
+                _client.Cookies.UpdateCookiesWithPathHandling( r );
+                return r;
+            }
+        }
+
         HttpClient GetExternalClient()
         {
             if( _externalClient == null )
             {
-                _externalClient = new HttpClient( new HttpClientHandler()
-                {
-                    CookieContainer = Cookies,
-                    AllowAutoRedirect = false
-                } );
+                _externalClient = new HttpClient( new ExternalHandler( this ) );
             }
             return _externalClient;
         }
