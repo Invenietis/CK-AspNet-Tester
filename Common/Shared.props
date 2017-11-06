@@ -28,7 +28,7 @@
         On appveyor, the clone folder MUST be set to the solution path in the CK-World.
         For this solution, it is:
 
-        clone_folder: C:\CK-World\CK-AspNet\CK-AspNet-Tester
+        clone_folder: C:\CK-World\CK-AspNet-Projects\CK-AspNet-Tester
 
         This must be adapted for each solution/repository.
     -->
