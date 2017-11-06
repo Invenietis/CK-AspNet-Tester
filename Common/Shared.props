@@ -24,6 +24,20 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
+    <!-- Reproducible builds. See: http://blog.paranoidcoding.com/2016/04/05/deterministic-builds-in-roslyn.html
+        On appveyor, the clone folder MUST be set to the solution path in the CK-World.
+        For this solution, it is:
+
+        clone_folder: C:\CK-World\CK-AspNet\CK-AspNet-Tester
+
+        This must be adapted for each solution/repository.
+    -->
+    <PropertyGroup>
+        <Deterministic>true</Deterministic>
+        <CKWorldPath>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), CK-World))</CKWorldPath>
+        <PathMap Condition=" '$(CKWorldPath)' != '' ">$(CKWorldPath)=C:\CK-World</PathMap>
+    </PropertyGroup>
+    
   <PropertyGroup>
     <!-- Standard properties. -->
     <AssemblyOriginatorKeyFile>$(SharedDir)SharedKey.snk</AssemblyOriginatorKeyFile>
