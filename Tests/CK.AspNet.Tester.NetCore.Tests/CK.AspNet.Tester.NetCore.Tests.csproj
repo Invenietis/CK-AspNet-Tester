@@ -11,12 +11,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\CK.AspNet.Tester\CK.AspNet.Tester.csproj" />
     <ProjectReference Include="..\StupidMiddleware\StupidMiddleware.csproj" />
-    <PackageReference Include="FluentAssertions" Version="4.19.4" />
+    <PackageReference Include="FluentAssertions" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.8.1" />
-    <PackageReference Include="NUnitLite" Version="3.8.1" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnitLite" Version="3.10.1" />
   </ItemGroup>
 
 
@@ -30,6 +30,11 @@
 
   <ItemGroup>
     <Compile Remove="..\CK.AspNet.Tester.Tests\RequestMonitorTests.cs" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   
 </Project>

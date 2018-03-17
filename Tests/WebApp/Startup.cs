@@ -37,7 +37,6 @@ namespace WebApp
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseRequestMonitor();
             app.UseMiddleware<StupidMiddleware>();
         }
     }
