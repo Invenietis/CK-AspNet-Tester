@@ -23,6 +23,7 @@ namespace WebApp
         public static void Main( string[] args )
         {
             var host = new WebHostBuilder()
+                .UseUrls( "http://localhost:7835" )
                 .UseKestrel()
                 .UseContentRoot( Directory.GetCurrentDirectory() )
                 .ConfigureLogging( b =>
