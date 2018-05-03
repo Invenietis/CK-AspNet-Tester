@@ -18,7 +18,7 @@ namespace CK.AspNet.Tester.Tests
             {
                 pI.WorkingDirectory = System.IO.Path.Combine( TestHelper.SolutionFolder, "Tests", "WebApp" );
                 pI.FileName = "dotnet";
-                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp2.0", "WebApp.dll" );
+                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp2.0", "WebApp.dll" ) + '"';
             } );
 
         TestClient _client;
@@ -31,7 +31,7 @@ namespace CK.AspNet.Tester.Tests
         public void RunWebAppAndCreateClient()
         {
             _webApp.EnsureRunning();
-            _client = new TestClient( "http://localhost:5000/" );
+            _client = new TestClient( "http://localhost:7835/" );
             _client.Get( "/" ).GetAwaiter().GetResult();
         }
 

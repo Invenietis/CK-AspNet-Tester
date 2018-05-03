@@ -12,7 +12,7 @@ namespace CK.AspNet.Tester
 {
 
     /// <summary>
-    /// Sets of helpers tho build a <see cref="IWebHostBuilder"/>.
+    /// Sets of helpers to build a <see cref="IWebHostBuilder"/>.
     /// </summary>
     public static class WebHostBuilderFactory
     {

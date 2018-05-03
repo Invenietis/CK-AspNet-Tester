@@ -7,7 +7,6 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using CK.Core;
 
 namespace WebApp
 {
@@ -23,18 +22,14 @@ namespace WebApp
         /// <param name="args"></param>
         public static void Main( string[] args )
         {
-            // Allow full debug logs for this sample application.
-            ActivityMonitor.DefaultFilter = LogFilter.Debug;
-
             var host = new WebHostBuilder()
+                .UseUrls( "http://localhost:7835" )
                 .UseKestrel()
                 .UseContentRoot( Directory.GetCurrentDirectory() )
                 .ConfigureLogging( b =>
                 {
                     b.SetMinimumLevel( Microsoft.Extensions.Logging.LogLevel.Trace );
                 } )
-                .ConfigureAppConfiguration( c => c.AddJsonFile( "appsettings.json", true, true ) )
-                .UseMonitoring()
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
