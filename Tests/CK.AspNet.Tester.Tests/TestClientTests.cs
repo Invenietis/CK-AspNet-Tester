@@ -23,11 +23,7 @@ namespace CK.AspNet.Tester.Tests
 
         TestClient _client;
 
-#if NET461
-        [TestFixtureSetUp]
-#else
         [OneTimeSetUp]
-#endif
         public void RunWebAppAndCreateClient()
         {
             _webApp.EnsureRunning();
@@ -35,11 +31,7 @@ namespace CK.AspNet.Tester.Tests
             _client.Get( "/" ).GetAwaiter().GetResult();
         }
 
-#if NET461
-        [TestFixtureTearDown]
-#else
         [OneTimeTearDown]
-#endif
         public void ShutdownWebAppAndCreateClient()
         {
             _client.Get( "/quit" ).GetAwaiter().GetResult();
