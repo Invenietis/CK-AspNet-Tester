@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OriginProjectName>CK.AspNet.Tester.Tests</OriginProjectName>
     <OutputType>Exe</OutputType>
+    <IsPackable>False</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CK.AspNet.Tester\CK.AspNet.Tester.csproj" />
