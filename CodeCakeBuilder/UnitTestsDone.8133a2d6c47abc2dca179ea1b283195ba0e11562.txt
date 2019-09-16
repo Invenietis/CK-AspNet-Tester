@@ -1,2 +1,0 @@
-C:/Dev/CK/CK-AspNet-Projects/CK-AspNet-Tester/Tests/CK.AspNet.Tester.Tests/bin/Debug/net461/CK.AspNet.Tester.Tests.dll
-C:/Dev/CK/CK-AspNet-Projects/CK-AspNet-Tester/Tests/CK.AspNet.Tester.NetCore.Tests/bin/Debug/netcoreapp2.1/CK.AspNet.Tester.NetCore.Tests.dll
