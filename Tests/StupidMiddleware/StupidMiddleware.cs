@@ -112,14 +112,16 @@ namespace CK.AspNet.Tester.Tests
             if( context.Request.Path.StartsWithSegments( "/rewriteJSON" ) )
             {
                 if( !HttpMethods.IsPost( context.Request.Method ) ) context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
-                string content = new StreamReader( context.Request.Body ).ReadToEnd();
-                return context.Response.WriteAsync( $"JSON: '{JObject.Parse( content ).ToString( Newtonsoft.Json.Formatting.None )}'" );
+                return ReadContentThen( context, content => context.Response.WriteAsync(
+                    $"JSON: '{JObject.Parse( content ).ToString( Newtonsoft.Json.Formatting.None )}'" )
+                );
             }
             if( context.Request.Path.StartsWithSegments( "/rewriteXElement" ) )
             {
                 if( !HttpMethods.IsPost( context.Request.Method ) ) context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
-                string content = new StreamReader( context.Request.Body ).ReadToEnd();
-                return context.Response.WriteAsync( $"XElement: '{XElement.Parse( content ).ToString( SaveOptions.DisableFormatting )}'" );
+                return ReadContentThen( context, content => context.Response.WriteAsync(
+                    $"XElement: '{XElement.Parse( content ).ToString( SaveOptions.DisableFormatting )}'"
+                ) );
             }
             if( context.Request.Path.StartsWithSegments( "/bug" ) )
             {
@@ -148,6 +150,12 @@ namespace CK.AspNet.Tester.Tests
             }
 
             return _next.Invoke( context );
+        }
+
+        async Task ReadContentThen( HttpContext context, Func<string, Task> action )
+        {
+            string content = await (new StreamReader( context.Request.Body )).ReadToEndAsync();
+            await action( content );
         }
 
         async Task AsyncBug()
