@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
 
 namespace CK.AspNet.Tester
 {
@@ -24,13 +26,15 @@ namespace CK.AspNet.Tester
         /// <param name="configureServices">Optional service configurator. Can be null.</param>
         /// <param name="configureApplication">Optional application configurator. Can be null.</param>
         /// <returns>The web host builder.</returns>
-        public static IWebHostBuilder Create(
+        public static IHostBuilder Create(
             Type startupType,
             string contentRoot,
             Action<IServiceCollection> configureServices,
-            Action<IApplicationBuilder> configureApplication )
+            Action<IApplicationBuilder> configureApplication,
+            Action<IWebHostBuilder> conf = null )
         {
-            return Create( startupType, contentRoot, new[] { configureServices }, new[] { configureApplication } );
+            return Create( startupType, contentRoot, new[] { configureServices }, new[] { configureApplication },
+                conf );
         }
 
         /// <summary>
@@ -41,29 +45,71 @@ namespace CK.AspNet.Tester
         /// <param name="configureServices">Optional service configurators. Can be null.</param>
         /// <param name="configureApplication">Optional application configurators. Can be null.</param>
         /// <returns>The web host builder.</returns>
-        public static IWebHostBuilder Create(
+        public static IHostBuilder Create(
+            Type startupType,
+            string contentRoot,
+            IEnumerable<Action<IServiceCollection>> configureServices,
+            IEnumerable<Action<IApplicationBuilder>> configureApplication,
+            Action<IWebHostBuilder> builder = null)
+        {
+            object startup = null;
+            var hostBuilder = new HostBuilder();
+            return hostBuilder.ConfigureWebHostDefaults( webHostBuilder =>
+             {
+                 if( contentRoot != null ) webHostBuilder.UseContentRoot( contentRoot );
+                 webHostBuilder.UseTestServer();
+                 webHostBuilder.UseEnvironment( Environments.Development );
+                 webHostBuilder.ConfigureServices( services =>
+                 {
+                     if( startupType != null )
+                     {
+                         startup = CreateStartupObject( startupType, services );
+                     }
+                     ConfigureServices( startup, services, configureServices );
+                 } )
+                   .Configure( builder =>
+                   {
+                       ConfigureApplication( startup, builder, configureApplication );
+                   } );
+                 builder?.Invoke( webHostBuilder );
+             } );
+        }
+
+
+        /// <summary>
+        /// Creates a web host builder with multiple service and application configurators.
+        /// </summary>
+        /// <param name="startupType">Optional type of the startup ovject. Can be null.</param>
+        /// <param name="contentRoot">Optional path of the content root. Can be null.</param>
+        /// <param name="configureServices">Optional service configurators. Can be null.</param>
+        /// <param name="configureApplication">Optional application configurators. Can be null.</param>
+        /// <returns>The web host builder.</returns>
+        public static IHostBuilder Create(
             Type startupType,
             string contentRoot,
             IEnumerable<Action<IServiceCollection>> configureServices,
             IEnumerable<Action<IApplicationBuilder>> configureApplication )
         {
             object startup = null;
-            var webHostBuilder = new WebHostBuilder();
-            if( contentRoot != null ) webHostBuilder.UseContentRoot( contentRoot );
-            webHostBuilder.UseEnvironment( EnvironmentName.Development );
-            webHostBuilder.ConfigureServices( services =>
-               {
-                   if( startupType != null )
-                   {
-                       startup = CreateStartupObject( startupType, services );
-                   }
-                   ConfigureServices( startup, services, configureServices );
-               } )
-              .Configure( builder =>
-               {
-                   ConfigureApplication( startup, builder, configureApplication );
-               } );
-            return webHostBuilder;
+            var hostBuilder = new HostBuilder()
+                .ConfigureWebHostDefaults( webHostBuilder =>
+                {
+                     if( contentRoot != null ) webHostBuilder.UseContentRoot( contentRoot );
+                     webHostBuilder.UseEnvironment( Environments.Development );
+                     webHostBuilder.ConfigureServices( services =>
+                     {
+                         if( startupType != null )
+                         {
+                             startup = CreateStartupObject( startupType, services );
+                         }
+                         ConfigureServices( startup, services, configureServices );
+                     } )
+                        .Configure( builder =>
+                        {
+                            ConfigureApplication( startup, builder, configureApplication );
+                        } );
+                } );
+            return hostBuilder;
         }
 
         static object CreateStartupObject( Type startupType, IServiceCollection services )
@@ -97,10 +143,10 @@ namespace CK.AspNet.Tester
             return startup;
         }
 
-        static IHostingEnvironment ConfigureHostingEnvironment( Type startup, IServiceCollection services )
+        static IWebHostEnvironment ConfigureHostingEnvironment( Type startup, IServiceCollection services )
         {
-            Func<ServiceDescriptor, bool> isHostingEnvironmet = service => service.ImplementationInstance is IHostingEnvironment;
-            var hostingEnvironment = (IHostingEnvironment)services.Single( isHostingEnvironmet ).ImplementationInstance;
+            Func<ServiceDescriptor, bool> isHostingEnvironmet = service => service.ImplementationInstance is IWebHostEnvironment;
+            var hostingEnvironment = (IWebHostEnvironment)services.Single( isHostingEnvironmet ).ImplementationInstance;
             var assembly = startup.GetTypeInfo().Assembly;
             hostingEnvironment.ApplicationName = assembly.GetName().Name;
             return hostingEnvironment;
