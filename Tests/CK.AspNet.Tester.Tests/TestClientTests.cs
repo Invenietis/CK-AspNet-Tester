@@ -18,7 +18,7 @@ namespace CK.AspNet.Tester.Tests
             {
                 pI.WorkingDirectory = System.IO.Path.Combine( TestHelper.SolutionFolder, "Tests", "WebApp" );
                 pI.FileName = "dotnet";
-                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp2.1", "WebApp.dll" ) + '"';
+                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp3.1", "WebApp.dll" ) + '"';
             } );
 
         TestClient _client;
