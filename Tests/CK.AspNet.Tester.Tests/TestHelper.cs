@@ -117,15 +117,6 @@ namespace CK.AspNet.Tester.Tests
             }
             _projectFolder = p = Path.GetDirectoryName( p );
             _currentTestProjectName = Path.GetFileName( p );
-            Assembly entry = Assembly.GetEntryAssembly();
-            if( entry != null )
-            {
-                string assemblyName = entry.GetName().Name;
-                if( _currentTestProjectName != assemblyName )
-                {
-                    throw new InvalidOperationException( $"Current test project assembly is '{assemblyName}' but folder is '{_currentTestProjectName}' (above '{_buildConfiguration}' in '{_binFolder}')." );
-                }
-            }
             p = Path.GetDirectoryName( p );
 
             string testsFolder = null;
