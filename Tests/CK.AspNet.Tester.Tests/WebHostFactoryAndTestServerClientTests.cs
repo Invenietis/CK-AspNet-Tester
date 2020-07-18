@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
 using System.Net;
 using System.Net.Http;
@@ -88,9 +89,11 @@ namespace CK.AspNet.Tester.Tests
                 app =>
                 {
                     app.UseMiddleware<StupidMiddleware>();
-                } );
-            var server = new TestServer( b );
-            return new TestServerClient( server, disposeTestServer: true );
+                },
+                c => c.UseTestServer() )
+                .Build();
+            b.Start();
+            return new TestServerClient( b, true );
         }
     }
 }

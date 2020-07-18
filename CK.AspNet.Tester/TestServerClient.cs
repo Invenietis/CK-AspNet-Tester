@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Diagnostics;
+using Microsoft.Extensions.Hosting;
 
 namespace CK.AspNet.Tester
 {
@@ -22,18 +23,19 @@ namespace CK.AspNet.Tester
     {
         readonly TestServer _testServer;
         HttpClient _externalClient;
-        readonly bool _disposeTestServer;
+        readonly bool _disposeHost;
 
         /// <summary>
         /// Initializes a new client for a <see cref="TestServer"/>.
         /// </summary>
         /// <param name="testServer">The test server.</param>
-        /// <param name="disposeTestServer">False to leave the TestServer alive when disposing this client.</param>
-        public TestServerClient( TestServer testServer, bool disposeTestServer = true )
-            : base( testServer.BaseAddress, new CookieContainer() )
+        /// <param name="disposeHost">False to leave the TestServer alive when disposing this client.</param>
+        public TestServerClient( IHost host, bool disposeHost = true )
+            : base( host.GetTestServer().BaseAddress, new CookieContainer() )
         {
-            _testServer = testServer;
-            _disposeTestServer = disposeTestServer;
+            _testServer = host.GetTestServer();
+            Host = host;
+            _disposeHost = disposeHost;
         }
 
         /// <summary>
@@ -45,6 +47,7 @@ namespace CK.AspNet.Tester
         /// Gets or sets the authorization token or clears it (by setting it to null).
         /// </summary>
         public override string Token { get; set; }
+        public IHost Host { get; }
 
         /// <summary>
         /// Issues a GET request to the relative url on <see cref="TestClientBase.BaseAddress"/> or to an absolute url.
@@ -53,7 +56,7 @@ namespace CK.AspNet.Tester
         /// <returns>The response.</returns>
         internal async protected override Task<HttpResponseMessage> DoGet( Uri url )
         {
-            if( url.IsAbsoluteUri && !BaseAddress.IsBaseOf( url ) ) 
+            if( url.IsAbsoluteUri && !BaseAddress.IsBaseOf( url ) )
             {
                 return await GetExternalClient().GetAsync( url );
             }
@@ -100,7 +103,11 @@ namespace CK.AspNet.Tester
                 _externalClient.Dispose();
                 _externalClient = null;
             }
-            if( _disposeTestServer ) _testServer.Dispose();
+            _testServer.Dispose();
+            if( _disposeHost )
+            {
+                Host.Dispose();
+            }
         }
 
         class ExternalHandler : DelegatingHandler
