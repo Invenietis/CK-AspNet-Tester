@@ -9,6 +9,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StupidMiddleware\StupidMiddleware.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.2.0" />
   </ItemGroup>
 </Project>
