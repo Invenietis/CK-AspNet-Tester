@@ -32,7 +32,7 @@ namespace CK.AspNet.Tester
 
             public long Length => _content.Length;
 
-            public string PhysicalPath => _name;
+            public string PhysicalPath => null;
 
             public string Name => _name;
 
@@ -92,7 +92,7 @@ namespace CK.AspNet.Tester
         }
 
         /// <summary>
-        /// Since paths ared not handled by this simplistic implementation,
+        /// Since paths are not handled by this simplistic implementation,
         /// always returns <see cref="NotFoundDirectoryContents.Singleton"/>.
         /// </summary>
         /// <param name="subpath">Ignored parameter.</param>

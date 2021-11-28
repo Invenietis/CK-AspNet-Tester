@@ -18,23 +18,23 @@ namespace CK.AspNet.Tester.Tests
             {
                 pI.WorkingDirectory = System.IO.Path.Combine( TestHelper.SolutionFolder, "Tests", "WebApp" );
                 pI.FileName = "dotnet";
-                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp3.1", "WebApp.dll" ) + '"';
+                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "net6.0", "WebApp.dll" ) + '"';
             } );
 
         TestClient _client;
 
         [OneTimeSetUp]
-        public void RunWebAppAndCreateClient()
+        public async Task RunWebAppAndCreateClient()
         {
             _webApp.EnsureRunning();
             _client = new TestClient( "http://localhost:7835/" );
-            _client.Get( "/" ).GetAwaiter().GetResult();
+            await _client.Get( "/" );
         }
 
         [OneTimeTearDown]
-        public void ShutdownWebAppAndCreateClient()
+        public async Task ShutdownWebAppAndCreateClient()
         {
-            _client.Get( "/quit" ).GetAwaiter().GetResult();
+            await _client.Get( "/quit" );
             _webApp.StopAndWaitForExit();
             _client.Dispose();
         }

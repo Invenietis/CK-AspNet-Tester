@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CK.AspNet;
 using Microsoft.Extensions.Logging;
 using CK.AspNet.Tester.Tests;
+using System.Diagnostics;
 
 namespace WebApp
 {
@@ -31,9 +32,9 @@ namespace WebApp
         /// </summary>
         /// <param name="app">Application builder.</param>
         /// <param name="env">Environment.</param>
-        public void Configure( IApplicationBuilder app, IHostingEnvironment env )
+        public void Configure( IApplicationBuilder app, IWebHostEnvironment env )
         {
-            if( env.IsDevelopment() )
+            if( env.EnvironmentName == "Development" )
             {
                 app.UseDeveloperExceptionPage();
             }
