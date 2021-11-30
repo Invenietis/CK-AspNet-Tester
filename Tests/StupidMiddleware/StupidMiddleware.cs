@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace CK.AspNet.Tester.Tests
 {
