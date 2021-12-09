@@ -1,16 +1,10 @@
 using Cake.Common.IO;
-using Cake.Common.Solution;
 using Cake.Core;
 using Cake.Core.Diagnostics;
-using Cake.Core.IO;
-using SimpleGitVersion;
-using System.Linq;
-using System;
-using System.Diagnostics;
 
 namespace CodeCake
 {
-    
+
     public partial class Build : CodeCakeHost
     {
         public Build()
