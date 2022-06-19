@@ -16,66 +16,66 @@ namespace CK.AspNet.Tester.Tests
     {
 
         [Test]
-        public async Task hello_world_and_notfound()
+        public async Task hello_world_and_notfound_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.hello_world_and_notfound( client );
+                await CommonTests.hello_world_and_notfound_Async( client );
             }
         }
 
         [Test]
-        public async Task authorization_token_works()
+        public async Task authorization_token_works_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.authorization_token_works( client );
+                await CommonTests.authorization_token_works_Async( client );
             }
         }
 
         [Test]
-        public async Task testing_PostXml()
+        public async Task testing_PostXml_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.testing_PostXml( client );
+                await CommonTests.testing_PostXml_Async( client );
             }
         }
 
         [Test]
-        public async Task testing_PostJSON()
+        public async Task testing_PostJSON_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.testing_PostJSON( client );
+                await CommonTests.testing_PostJSON_Async( client );
             }
         }
 
         [Test]
-        public async Task setting_cookie_and_delete_on_root_path()
+        public async Task setting_cookie_and_delete_on_root_path_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.setting_cookie_and_delete_on_root_path( client );
+                await CommonTests.setting_cookie_and_delete_on_root_path_Async( client );
             }
         }
 
 
         [Test]
-        public async Task setting_cookie_and_delete_without_path()
+        public async Task setting_cookie_and_delete_without_path_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.setting_cookie_and_delete_without_path( client );
+                await CommonTests.setting_cookie_and_delete_without_path_Async( client );
             }
         }
 
         [Test]
-        public async Task setting_cookie_and_delete_on_sub_path()
+        public async Task setting_cookie_and_delete_on_sub_path_Async()
         {
             using( var client = CreateClient() )
             {
-                await CommonTests.setting_cookie_and_delete_on_sub_path( client );
+                await CommonTests.setting_cookie_and_delete_on_sub_path_Async( client );
             }
         }
 

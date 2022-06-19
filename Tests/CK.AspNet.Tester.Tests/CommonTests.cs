@@ -12,23 +12,23 @@ namespace CK.AspNet.Tester.Tests
 {
     static class CommonTests
     {
-        static public async Task authorization_token_works( TestClientBase client )
+        static public async Task authorization_token_works_Async( TestClientBase client )
         {
             client.Token = "my token";
-            using( HttpResponseMessage m = await client.Get( $"/readHeader?name={client.AuthorizationHeaderName}" ) )
+            using( HttpResponseMessage m = await client.GetAsync( $"/readHeader?name={client.AuthorizationHeaderName}" ) )
             {
                 (await m.Content.ReadAsStringAsync()).Should().Be( $"header '{client.AuthorizationHeaderName}': 'Bearer my token'" );
             }
         }
 
-        static public async Task hello_world_and_notfound( TestClientBase client )
+        static public async Task hello_world_and_notfound_Async( TestClientBase client )
         {
-            using( HttpResponseMessage notFound = await client.Get( "/other" ) )
+            using( HttpResponseMessage notFound = await client.GetAsync( "/other" ) )
             {
                 notFound.StatusCode.Should().Be( HttpStatusCode.NotFound );
             }
 
-            using( HttpResponseMessage hello = await client.Get( "/sayHello" ) )
+            using( HttpResponseMessage hello = await client.GetAsync( "/sayHello" ) )
             {
                 hello.StatusCode.Should().Be( HttpStatusCode.OK );
                 var content = await hello.Content.ReadAsStringAsync();
@@ -36,25 +36,25 @@ namespace CK.AspNet.Tester.Tests
             }
         }
 
-        static public async Task testing_PostXml( TestClientBase client )
+        static public async Task testing_PostXml_Async( TestClientBase client )
         {
-            using( HttpResponseMessage m = await client.PostXml( "/rewriteXElement", "<a  >  <b/> </a>" ) )
+            using( HttpResponseMessage m = await client.PostXmlAsync( "/rewriteXElement", "<a  >  <b/> </a>" ) )
             {
                 (await m.Content.ReadAsStringAsync()).Should().Be( "XElement: '<a><b /></a>'" );
             }
         }
 
-        static public async Task testing_PostJSON( TestClientBase client )
+        static public async Task testing_PostJSON_Async( TestClientBase client )
         {
-            using( HttpResponseMessage m = await client.PostJSON( "/rewriteJSON", @"{ ""a""  : null, ""b"" : {}  }" ) )
+            using( HttpResponseMessage m = await client.PostJSONAsync( "/rewriteJSON", @"{ ""a""  : null, ""b"" : {}  }" ) )
             {
                 (await m.Content.ReadAsStringAsync()).Should().Be( @"JSON: '{""a"":null,""b"":{}}'" );
             }
         }
 
-        static public async Task setting_cookie_and_delete_on_root_path( TestClientBase client )
+        static public async Task setting_cookie_and_delete_on_root_path_Async( TestClientBase client )
         {
-            using( HttpResponseMessage m = await client.Get( "/setCookie?name=Gateau&path=%2F" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/setCookie?name=Gateau&path=%2F" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().StartWith( "Cookie set: Gateau Path: / Value: CookieValue" );
@@ -63,35 +63,35 @@ namespace CK.AspNet.Tester.Tests
                 cookies[0].Name.Should().Be( "Gateau" );
                 cookies[0].Path.Should().Be( "/" );
             }
-            using( HttpResponseMessage m = await client.Get( "/sub/path/?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/sub/path/?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:CookieValue\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:CookieValue\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau&path=%2F" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/deleteCookie?name=Gateau&path=%2F" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie delete: Gateau Path: /" );
                 var cookies = client.Cookies.GetCookies( client.BaseAddress );
                 cookies.Should().BeEmpty();
             }
-            using( HttpResponseMessage m = await client.Get( "?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().BeEmpty();
             }
         }
 
-        static public async Task setting_cookie_and_delete_on_sub_path( TestClientBase client )
+        static public async Task setting_cookie_and_delete_on_sub_path_Async( TestClientBase client )
         {
             Assume.That( false, "Net6.0 CookieContainer is buggy :(" );
             var cookiePath = new Uri( client.BaseAddress, "/COOKIEPATH" );
-            using( HttpResponseMessage m = await client.Get( "/setCookie?name=Gateau&path=%2FCOOKIEPATH" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/setCookie?name=Gateau&path=%2FCOOKIEPATH" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().StartWith( "Cookie set: Gateau Path: /COOKIEPATH Value: CookieValue" );
@@ -109,34 +109,34 @@ namespace CK.AspNet.Tester.Tests
                 // This doesn't work... the Cookie is registered in "/".
                 // cookies[0].Path = "/COOKIEPATH";
             }
-            using( HttpResponseMessage m = await client.Get( "?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().BeEmpty();
             }
-            using( HttpResponseMessage m = await client.Get( "/COOKIEPATH/sub/path/?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/COOKIEPATH/sub/path/?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:CookieValue\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau&path=%2FCOOKIEPATH" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/deleteCookie?name=Gateau&path=%2FCOOKIEPATH" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie delete: Gateau Path: /COOKIEPATH" );
                 var cookies = client.Cookies.GetCookies( cookiePath );
                 cookies.Should().BeEmpty();
             }
-            using( HttpResponseMessage m = await client.Get( "/COOKIEPATH/sub/path/?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/COOKIEPATH/sub/path/?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().BeEmpty();
             }
         }
 
-        static public async Task setting_cookie_and_delete_without_path( TestClientBase client )
+        static public async Task setting_cookie_and_delete_without_path_Async( TestClientBase client )
         {
             var setCookieUri = new Uri( client.BaseAddress, "/setCookie" );
-            using( HttpResponseMessage m = await client.Get( "/setCookie?name=Gateau&value=V" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/setCookie?name=Gateau&value=V" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie set: Gateau Path:  Value: V" );
@@ -160,34 +160,34 @@ namespace CK.AspNet.Tester.Tests
                 cookies.Should().HaveCount( 1 );
             }
             Assume.That( false, "Net6.0 CookieContainer is buggy :(" );
-            using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/deleteCookie?name=Gateau" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie delete: Gateau Path: " );
                 var cookies = client.Cookies.GetCookies( setCookieUri );
                 cookies.Should().HaveCount( 1 );
             }
-            using( HttpResponseMessage m = await client.Get( "setCookie/sub/path/?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "setCookie/sub/path/?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:V\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "setCookie/?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "setCookie/?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:V\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "setCookie?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "setCookie?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Gateau:V\r\n" );
             }
-            using( HttpResponseMessage m = await client.Get( "?readCookies" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "?readCookies" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().BeEmpty();
             }
-            using( HttpResponseMessage m = await client.Get( "/deleteCookie?name=Gateau&path=/setCookie" ) )
+            using( HttpResponseMessage m = await client.GetAsync( "/deleteCookie?name=Gateau&path=/setCookie" ) )
             {
                 var text = await m.Content.ReadAsStringAsync();
                 text.Should().Be( "Cookie delete: Gateau Path: /setCookie" );

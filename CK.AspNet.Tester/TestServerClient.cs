@@ -26,9 +26,9 @@ namespace CK.AspNet.Tester
         readonly bool _disposeHost;
 
         /// <summary>
-        /// Initializes a new client for a <see cref="TestServer"/>.
+        /// Initializes a new client for a host.
         /// </summary>
-        /// <param name="testServer">The test server.</param>
+        /// <param name="host">The host.</param>
         /// <param name="disposeHost">False to leave the TestServer alive when disposing this client.</param>
         public TestServerClient( IHost host, bool disposeHost = true )
             : base( host.GetTestServer().BaseAddress, new CookieContainer() )
@@ -47,6 +47,10 @@ namespace CK.AspNet.Tester
         /// Gets or sets the authorization token or clears it (by setting it to null).
         /// </summary>
         public override string Token { get; set; }
+
+        /// <summary>
+        /// Gets the host.
+        /// </summary>
         public IHost Host { get; }
 
         /// <summary>
@@ -54,7 +58,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        internal async protected override Task<HttpResponseMessage> DoGet( Uri url )
+        internal async protected override Task<HttpResponseMessage> Async( Uri url )
         {
             if( url.IsAbsoluteUri && !BaseAddress.IsBaseOf( url ) )
             {
@@ -75,7 +79,7 @@ namespace CK.AspNet.Tester
         /// <param name="url">The relative or absolute url.</param>
         /// <param name="content">The content.</param>
         /// <returns>The response.</returns>
-        internal async protected override Task<HttpResponseMessage> DoPost( Uri url, HttpContent content )
+        internal async protected override Task<HttpResponseMessage> DoPostAsync( Uri url, HttpContent content )
         {
             if( url.IsAbsoluteUri && !BaseAddress.IsBaseOf( url ) )
             {

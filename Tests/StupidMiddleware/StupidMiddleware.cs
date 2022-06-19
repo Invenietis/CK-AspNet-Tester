@@ -33,9 +33,9 @@ namespace CK.AspNet.Tester.Tests
         /// <param name="lifetime">The application lifetime to handle /quit.</param>
         /// <param name="logger">Logger factory to handle /aspnetlogs.</param>
         public StupidMiddleware( RequestDelegate next,
-            StupidService s,
-            IApplicationLifetime lifetime,
-            ILoggerFactory logger )
+                                 StupidService s,
+                                 IApplicationLifetime lifetime,
+                                 ILoggerFactory logger )
         {
             _next = next;
             _s = s;
@@ -48,7 +48,7 @@ namespace CK.AspNet.Tester.Tests
         /// </summary>
         /// <param name="context">The http context.</param>
         /// <returns>The awaitable.</returns>
-        public Task Invoke( HttpContext context )
+        public Task InvokeAsync( HttpContext context )
         {
             if( context.Request.Query.ContainsKey( "readCookies" ) )
             {
@@ -113,14 +113,14 @@ namespace CK.AspNet.Tester.Tests
             if( context.Request.Path.StartsWithSegments( "/rewriteJSON" ) )
             {
                 if( !HttpMethods.IsPost( context.Request.Method ) ) context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
-                return ReadContentThen( context, content => context.Response.WriteAsync(
+                return ReadContentThenAsync( context, content => context.Response.WriteAsync(
                     $"JSON: '{JObject.Parse( content ).ToString( Newtonsoft.Json.Formatting.None )}'" )
                 );
             }
             if( context.Request.Path.StartsWithSegments( "/rewriteXElement" ) )
             {
                 if( !HttpMethods.IsPost( context.Request.Method ) ) context.Response.StatusCode = StatusCodes.Status405MethodNotAllowed;
-                return ReadContentThen( context, content => context.Response.WriteAsync(
+                return ReadContentThenAsync( context, content => context.Response.WriteAsync(
                     $"XElement: '{XElement.Parse( content ).ToString( SaveOptions.DisableFormatting )}'"
                 ) );
             }
@@ -130,15 +130,15 @@ namespace CK.AspNet.Tester.Tests
             }
             if( context.Request.Path.StartsWithSegments( "/asyncBug" ) )
             {
-                return AsyncBug();
+                return AsyncBugAsync();
             }
             if( context.Request.Path.StartsWithSegments( "/hiddenAsyncBug" ) )
             {
                 context.Response.StatusCode = StatusCodes.Status202Accepted;
-                Task.Delay( 100 ).ContinueWith( t =>
+                _ = Task.Delay( 100 ).ContinueWith( t =>
                 {
                     throw new Exception( "I'm an horrible HiddenAsyncBug!" );
-                } );
+                }, TaskScheduler.Default );
                 return context.Response.WriteAsync( "Will break the started Task." );
             }
             if( context.Request.Path.StartsWithSegments( "/unhandledAppDomainException" ) )
@@ -153,13 +153,13 @@ namespace CK.AspNet.Tester.Tests
             return _next.Invoke( context );
         }
 
-        async Task ReadContentThen( HttpContext context, Func<string, Task> action )
+        async Task ReadContentThenAsync( HttpContext context, Func<string, Task> action )
         {
             string content = await (new StreamReader( context.Request.Body )).ReadToEndAsync();
             await action( content );
         }
 
-        async Task AsyncBug()
+        async Task AsyncBugAsync()
         {
             await Task.Delay( 100 );
             throw new Exception( "AsyncBug!" );
