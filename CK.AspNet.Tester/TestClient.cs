@@ -69,7 +69,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        internal protected override Task<HttpResponseMessage> Async( Uri url )
+        internal protected override Task<HttpResponseMessage> DoGetAsync( Uri url )
         {
             var absoluteUrl = new Uri( BaseAddress, url );
             return _httpClient.GetAsync( absoluteUrl );

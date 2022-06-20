@@ -88,7 +88,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        public virtual async Task<HttpResponseMessage> GetAsync( Uri url ) => await HandleResponseAsync( await Async( url ) );
+        public virtual async Task<HttpResponseMessage> GetAsync( Uri url ) => await HandleResponseAsync( await DoGetAsync( url ) );
 
         /// <summary>
         /// Issues a GET request to the relative url on <see cref="BaseAddress"/> or to an absolute url.
@@ -97,7 +97,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        internal protected abstract Task<HttpResponseMessage> Async( Uri url );
+        internal protected abstract Task<HttpResponseMessage> DoGetAsync( Uri url );
 
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url
@@ -205,7 +205,7 @@ namespace CK.AspNet.Tester
 
         /// <summary>
         /// Gets or sets a <see cref="HttpResponseMessage"/> handler.
-        /// This handler will be called immediately after the <see cref="DoPostAsync"/> or <see cref="Async"/>
+        /// This handler will be called immediately after the <see cref="DoPostAsync"/> or <see cref="DoGetAsync"/>
         /// methods and is typically in charge of handling cookies (thanks
         /// to <see cref="CookieContainerExtensions.UpdateCookiesWithPathHandling(CookieContainer, HttpResponseMessage)"/> helper for instance),
         /// but not the redirections.
@@ -274,7 +274,7 @@ namespace CK.AspNet.Tester
                 redirectUrl = new Uri( response.RequestMessage.RequestUri, redirectUrl );
             }
             response.Dispose();
-            return Async( redirectUrl );
+            return DoGetAsync( redirectUrl );
         }
 
         /// <summary>

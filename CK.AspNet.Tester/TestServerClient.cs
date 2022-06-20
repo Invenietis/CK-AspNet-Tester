@@ -58,7 +58,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        internal async protected override Task<HttpResponseMessage> Async( Uri url )
+        internal async protected override Task<HttpResponseMessage> DoGetAsync( Uri url )
         {
             if( url.IsAbsoluteUri && !BaseAddress.IsBaseOf( url ) )
             {
