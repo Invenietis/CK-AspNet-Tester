@@ -30,7 +30,7 @@ namespace CK.AspNet.Tester
             BaseAddress = baseAddress;
             Cookies = cookies;
             MaxAutomaticRedirections = 50;
-            OnReceiveMessage = DefaultOnReceiveMessage;
+            OnReceiveMessage = DefaultOnReceiveMessageAsync;
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace CK.AspNet.Tester
         /// <summary>
         /// Gets or sets the maximum number of redirections that will be automatically followed.
         /// Defaults to 50.
-        /// Set it to 0 to manually follow redirections thanks to <see cref="FollowRedirect(HttpResponseMessage, bool)"/>.
+        /// Set it to 0 to manually follow redirections thanks to <see cref="FollowRedirectAsync(HttpResponseMessage, bool)"/>.
         /// </summary>
         public int MaxAutomaticRedirections
         {
@@ -78,9 +78,9 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> Get( string url )
+        public Task<HttpResponseMessage> GetAsync( string url )
         {
-            return Get( new Uri( url, UriKind.RelativeOrAbsolute ) );
+            return GetAsync( new Uri( url, UriKind.RelativeOrAbsolute ) );
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        public virtual async Task<HttpResponseMessage> Get( Uri url ) => await HandleResponse( await DoGet( url ) );
+        public virtual async Task<HttpResponseMessage> GetAsync( Uri url ) => await HandleResponseAsync( await DoGetAsync( url ) );
 
         /// <summary>
         /// Issues a GET request to the relative url on <see cref="BaseAddress"/> or to an absolute url.
@@ -97,7 +97,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <returns>The response.</returns>
-        internal protected abstract Task<HttpResponseMessage> DoGet( Uri url );
+        internal protected abstract Task<HttpResponseMessage> DoGetAsync( Uri url );
 
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url
@@ -106,9 +106,9 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="formValues">The form values.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> Post( string url, IEnumerable<KeyValuePair<string, string>> formValues )
+        public Task<HttpResponseMessage> PostAsync( string url, IEnumerable<KeyValuePair<string, string>> formValues )
         {
-            return Post( new Uri( url, UriKind.RelativeOrAbsolute ), formValues );
+            return PostAsync( new Uri( url, UriKind.RelativeOrAbsolute ), formValues );
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="json">The json content.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> PostJSON( string url, string json ) => PostJSON( new Uri( url, UriKind.RelativeOrAbsolute ), json );
+        public Task<HttpResponseMessage> PostJSONAsync( string url, string json ) => PostJSONAsync( new Uri( url, UriKind.RelativeOrAbsolute ), json );
 
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url 
@@ -127,10 +127,10 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="json">The json content.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> PostJSON( Uri url, string json )
+        public Task<HttpResponseMessage> PostJSONAsync( Uri url, string json )
         {
             var c = new StringContent( json, Encoding.UTF8, "application/json" );
-            return Post( url, c );
+            return PostAsync( url, c );
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="xml">The xml content.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> PostXml( string url, string xml ) => PostXml( new Uri( url, UriKind.RelativeOrAbsolute ), xml );
+        public Task<HttpResponseMessage> PostXmlAsync( string url, string xml ) => PostXmlAsync( new Uri( url, UriKind.RelativeOrAbsolute ), xml );
 
 
         /// <summary>
@@ -150,10 +150,10 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="xml">The xml content.</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> PostXml( Uri url, string xml )
+        public Task<HttpResponseMessage> PostXmlAsync( Uri url, string xml )
         {
             var c = new StringContent( xml, Encoding.UTF8, "application/xml" );
-            return Post( url, c );
+            return PostAsync( url, c );
         }
 
         /// <summary>
@@ -163,9 +163,9 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="formValues">The form values (compatible with a IDictionary&lt;string, string&gt;).</param>
         /// <returns>The response.</returns>
-        public Task<HttpResponseMessage> Post( Uri url, IEnumerable<KeyValuePair<string, string>> formValues )
+        public Task<HttpResponseMessage> PostAsync( Uri url, IEnumerable<KeyValuePair<string, string>> formValues )
         {
-            return Post( url, new FormUrlEncodedContent( formValues ) );
+            return PostAsync( url, new FormUrlEncodedContent( formValues ) );
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="content">The content.</param>
         /// <returns>The response.</returns>
-        public async virtual Task<HttpResponseMessage> Post( Uri url, HttpContent content ) => await HandleResponse( await DoPost( url, content ) );
+        public async virtual Task<HttpResponseMessage> PostAsync( Uri url, HttpContent content ) => await HandleResponseAsync( await DoPostAsync( url, content ) );
 
         /// <summary>
         /// Issues a POST request to the relative url on <see cref="BaseAddress"/> or to an absolute url 
@@ -184,19 +184,19 @@ namespace CK.AspNet.Tester
         /// <param name="url">The BaseAddress relative url or an absolute url.</param>
         /// <param name="content">The content.</param>
         /// <returns>The response.</returns>
-        internal protected abstract Task<HttpResponseMessage> DoPost( Uri url, HttpContent content );
+        internal protected abstract Task<HttpResponseMessage> DoPostAsync( Uri url, HttpContent content );
 
         /// <summary>
         /// Follows at most <see cref="MaxAutomaticRedirections"/>.
         /// </summary>
         /// <param name="m">The original response.</param>
         /// <returns>The final response.</returns>
-        protected async Task<HttpResponseMessage> AutoFollowRedirect( HttpResponseMessage m )
+        protected async Task<HttpResponseMessage> AutoFollowRedirectAsync( HttpResponseMessage m )
         {
             int redirection = _maxAutomaticRedirections;
             while( --redirection >= 0 )
             {
-                var next = await FollowRedirect( m, throwIfNotRedirect: false );
+                var next = await FollowRedirectAsync( m, throwIfNotRedirect: false );
                 if( next == m ) break;
                 m = next;
             }
@@ -205,20 +205,25 @@ namespace CK.AspNet.Tester
 
         /// <summary>
         /// Gets or sets a <see cref="HttpResponseMessage"/> handler.
-        /// This handler will be called immediatly after the <see cref="DoPost"/> or <see cref="DoGet"/>
+        /// This handler will be called immediately after the <see cref="DoPostAsync"/> or <see cref="DoGetAsync"/>
         /// methods and is typically in charge of handling cookies (thanks
-        /// to <see cref="UpdateCookiesWithPathHandling"/> helper for instance), but not the redirections.
-        /// This handler must return true to automatically call <see cref="AutoFollowRedirect"/>
+        /// to <see cref="CookieContainerExtensions.UpdateCookiesWithPathHandling(CookieContainer, HttpResponseMessage)"/> helper for instance),
+        /// but not the redirections.
+        /// <para>
+        /// This handler must return true to automatically call <see cref="AutoFollowRedirectAsync"/>
         /// or false if for any reason, AutoFollowRedirect must not be done.
+        /// </para>
+        /// <para>
         /// This property MUST not be null.
+        /// </para>
         /// </summary>
         public Func<HttpResponseMessage,Task<bool>> OnReceiveMessage { get; set; }
 
-        async Task<HttpResponseMessage> HandleResponse( HttpResponseMessage m )
+        async Task<HttpResponseMessage> HandleResponseAsync( HttpResponseMessage m )
         {
             if( OnReceiveMessage == null ) throw new InvalidOperationException( $"{nameof(OnReceiveMessage)} must not be null." );
             return await OnReceiveMessage( m )
-                    ? await AutoFollowRedirect( m )
+                    ? await AutoFollowRedirectAsync( m )
                     : m;
         }
 
@@ -228,7 +233,7 @@ namespace CK.AspNet.Tester
         /// </summary>
         /// <param name="m">The received message.</param>
         /// <returns>True to auto follow redirects if any.</returns>
-        public virtual Task<bool> DefaultOnReceiveMessage( HttpResponseMessage m )
+        public virtual Task<bool> DefaultOnReceiveMessageAsync( HttpResponseMessage m )
         {
             return Task.FromResult( true );
         }
@@ -250,7 +255,7 @@ namespace CK.AspNet.Tester
         /// otherwise redirections are automatically followed.
         /// A redirection always uses the GET method.
         /// </remarks>
-        public virtual Task<HttpResponseMessage> FollowRedirect( HttpResponseMessage response, bool throwIfNotRedirect = false )
+        public virtual Task<HttpResponseMessage> FollowRedirectAsync( HttpResponseMessage response, bool throwIfNotRedirect = false )
         {
             if( response.StatusCode == HttpStatusCode.TemporaryRedirect )
             {
@@ -269,7 +274,7 @@ namespace CK.AspNet.Tester
                 redirectUrl = new Uri( response.RequestMessage.RequestUri, redirectUrl );
             }
             response.Dispose();
-            return DoGet( redirectUrl );
+            return DoGetAsync( redirectUrl );
         }
 
         /// <summary>

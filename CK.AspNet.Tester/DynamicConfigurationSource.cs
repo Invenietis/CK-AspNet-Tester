@@ -109,7 +109,7 @@ namespace CK.AspNet.Tester
         public IConfigurationProvider Build( IConfigurationBuilder builder ) => this;
 
         /// <summary>
-        /// Returns all the keys & values configurations.
+        /// Returns all the keys and values configurations.
         /// </summary>
         /// <returns>The enumerator.</returns>
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator() => Data.GetEnumerator();

@@ -18,67 +18,67 @@ namespace CK.AspNet.Tester.Tests
             {
                 pI.WorkingDirectory = System.IO.Path.Combine( TestHelper.SolutionFolder, "Tests", "WebApp" );
                 pI.FileName = "dotnet";
-                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "netcoreapp3.1", "WebApp.dll" ) + '"';
+                pI.Arguments = '"' + System.IO.Path.Combine( "bin", TestHelper.BuildConfiguration, "net6.0", "WebApp.dll" ) + '"';
             } );
 
         TestClient _client;
 
         [OneTimeSetUp]
-        public void RunWebAppAndCreateClient()
+        public async Task RunWebAppAndCreateClientAsync()
         {
             _webApp.EnsureRunning();
             _client = new TestClient( "http://localhost:7835/" );
-            _client.Get( "/" ).GetAwaiter().GetResult();
+            await _client.GetAsync( "/" );
         }
 
         [OneTimeTearDown]
-        public void ShutdownWebAppAndCreateClient()
+        public async Task ShutdownWebAppAndCreateClientAsync()
         {
-            _client.Get( "/quit" ).GetAwaiter().GetResult();
+            await _client.GetAsync( "/quit" );
             _webApp.StopAndWaitForExit();
             _client.Dispose();
         }
 
         [Test]
-        public async Task hello_world_and_notfound()
+        public async Task hello_world_and_notfound_Async()
         {
-            await CommonTests.hello_world_and_notfound( _client );
+            await CommonTests.hello_world_and_notfound_Async( _client );
         }
 
         [Test]
-        public async Task authorization_token_works()
+        public async Task authorization_token_works_Async()
         {
-            await CommonTests.authorization_token_works( _client );
+            await CommonTests.authorization_token_works_Async( _client );
         }
 
         [Test]
-        public async Task testing_PostXml()
+        public async Task testing_PostXml_Async()
         {
-            await CommonTests.testing_PostXml( _client );
+            await CommonTests.testing_PostXml_Async( _client );
         }
 
         [Test]
-        public async Task testing_PostJSON()
+        public async Task testing_PostJSON_Async()
         {
-            await CommonTests.testing_PostJSON( _client );
+            await CommonTests.testing_PostJSON_Async( _client );
         }
 
         [Test]
-        public async Task setting_cookie_and_delete_on_root_path()
+        public async Task setting_cookie_and_delete_on_root_path_Async()
         {
-            await CommonTests.setting_cookie_and_delete_on_root_path( _client );
+            await CommonTests.setting_cookie_and_delete_on_root_path_Async( _client );
         }
 
         [Test]
-        public async Task setting_cookie_and_delete_on_sub_path()
+        public async Task setting_cookie_and_delete_on_sub_path_Async()
         {
-            await CommonTests.setting_cookie_and_delete_on_sub_path( _client );
+            await CommonTests.setting_cookie_and_delete_on_sub_path_Async( _client );
         }
 
         [Test]
-        public async Task setting_cookie_and_delete_without_path()
+        public async Task setting_cookie_and_delete_without_path_Async()
         {
-            await CommonTests.setting_cookie_and_delete_without_path( _client );
+            await CommonTests.setting_cookie_and_delete_without_path_Async( _client );
         }
     }
 }
