@@ -4,7 +4,7 @@
     <Description>AspNet Core integration test tools like WebHostBuilderFactory and TestClient.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
   </ItemGroup>
 </Project>
